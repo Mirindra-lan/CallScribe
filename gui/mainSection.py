@@ -18,15 +18,19 @@ class MainSection(QWidget):
 
         self.suggestion1 = QTextBrowser()
         self.suggestion1.setText("Suggestion 1")
+        self.signal.sug1.connect(self.setSuggestion1)
         
         self.suggestion2 = QTextBrowser()
         self.suggestion2.setText("Suggestion 2")
+        self.signal.sug2.connect(self.setSuggestion2)
         
         self.suggestion3 = QTextBrowser()
         self.suggestion3.setText("Suggestion 3")
+        self.signal.sug3.connect(self.setSuggestion3)
         
         self.suggestion4 = QTextBrowser()
         self.suggestion4.setText("Suggestion 4")
+        self.signal.sug4.connect(self.setSuggestion4)
 
         suggestionTitre = QLabel("Suggestions")
 
@@ -62,3 +66,15 @@ class MainSection(QWidget):
         else :
             self.send.setText("Démarrer")
         self.sig.state.emit(self.toggle)
+
+    def setSuggestion1(self,value):
+        self.suggestion1.setText(value)
+        
+    def setSuggestion2(self,value):
+        self.suggestion2.setText(value)
+    
+    def setSuggestion3(self,value):
+        self.suggestion3.setText(value)
+    
+    def setSuggestion4(self,value):
+        self.suggestion4.setText(value)

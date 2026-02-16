@@ -9,10 +9,10 @@ class WhisperAsr:
 
     def transcribe(self, audio):
         self.sig.titre.emit("Transcription en cours...")
-        res = self.model.transcribe(audio)
-        # print("transcription en cours....")
+        res = self.model.transcribe(audio, language="en")
         self.sig.text.emit(res["text"])
         self.sig.titre.emit("Fin de transcription")
+        # print("transcription en cours....")
         # print(res["text"])
 
     def queueToAudio(self, voice_queue: queue.Queue) -> np.ndarray:

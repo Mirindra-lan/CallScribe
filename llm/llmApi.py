@@ -5,8 +5,8 @@ import os
 class LlmApi:
     def __init__(self):
         load_dotenv()
-        self.apiKey = os.getenv("OPENAI_API_KEY")
-        self.url = os.getenv("OPENAI_URL")
+        self.apiKey = os.getenv("OPENWEBUI_API_KEY")
+        self.url = os.getenv("OPENWEBUI_URL")
         self.modelLlm = os.getenv("MODEL")
         self.prompt = """
         Tu dois répondre UNIQUEMENT avec un JSON valide.
@@ -91,4 +91,7 @@ class LlmApi:
             print("Le content n'est pas un JSON valide")
             return None
 
-        return jsonData
+        # return jsonData
+        if jsonData is not None:
+            if jsonData["res"]:
+                return jsonData["res"][0], jsonData["res"][1], jsonData["res"][2], jsonData["res"][3]
