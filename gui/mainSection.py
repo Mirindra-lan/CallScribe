@@ -1,4 +1,5 @@
-from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QTextBrowser, QHBoxLayout
+from PySide6.QtWidgets import (QWidget, QLabel, QVBoxLayout, QPushButton, QTextBrowser, QHBoxLayout,
+QScrollArea, QSizePolicy)
 from PySide6.QtCore import Qt
 
 class MainSection(QWidget):
@@ -9,11 +10,16 @@ class MainSection(QWidget):
         self.title = QLabel("Résultat de la transcription avec whisper")
         self.signal.titre.connect(self.changeTitre)
 
+        self.container = QWidget()
+        self.scroll_layout = QVBoxLayout(self.container)
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_layout.setAlignment(Qt.AlignTop)
+        self.scroll_area.setWidget(self.container)
+
         self.send = QPushButton("Démarrer")
         self.send.clicked.connect(self.HandleChange)
 
-        self.text = QTextBrowser()
-        self.text.setText("Parole transcrite")
         self.signal.text.connect(self.showTranscription)
 
         self.suggestion1 = QTextBrowser()
@@ -41,7 +47,7 @@ class MainSection(QWidget):
         sec2.setAlignment(Qt.AlignTop)
 
         sec1.addWidget(self.title)
-        sec1.addWidget(self.text)
+        sec1.addWidget(self.scroll_area)
 
         sec2.addWidget(suggestionTitre)
         sec2.addWidget(self.suggestion1)
@@ -55,9 +61,53 @@ class MainSection(QWidget):
 
     def changeTitre(self,value):
         self.title.setText(value)
-
+    
     def showTranscription(self, value):
-        self.text.setText(value)
+        if value:
+            layout = QHBoxLayout()
+
+            text = QTextBrowser()
+            text.setText(value)
+
+            # Désactiver scroll interne
+            text.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            text.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+            # Hauteur fixe basée sur le contenu
+            text.document().adjustSize()
+            # height = text.document().size().height()
+            height = text.document().documentLayout().documentSize().height()
+
+            text.setFixedHeight(int(height + 10))
+
+            # Empêcher expansion verticale
+            text.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
+            # Style optionnel (bulle)
+            text.setStyleSheet("""
+                QTextBrowser {
+                    padding: 8px;
+                    border-radius: 12px;
+                    background-color: #0A0A0A;
+                    border: none;
+                }
+            """)
+
+            layout.addWidget(text, 70)
+            layout.addStretch(30)
+
+            self.scroll_layout.addLayout(layout)
+
+            # Scroll automatique vers le bas
+            self.scroll_area.verticalScrollBar().setValue(
+                self.scroll_area.verticalScrollBar().maximum()
+            )
+
+    # def showTranscription(self, value):
+    #     if value:
+    #         text = QTextBrowser()
+    #         text.setText(value)
+    #         self.scroll_layout.addWidget(text)
 
     def HandleChange(self):
         self.toggle = not self.toggle
