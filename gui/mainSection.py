@@ -62,10 +62,10 @@ class MainSection(QWidget):
     def changeTitre(self,value):
         self.title.setText(value)
     
-    def showTranscription(self, value):
+    def showTranscription(self, value, isUser):
         if value:
             layout = QHBoxLayout()
-
+            color = "#0A0A55"
             text = QTextBrowser()
             text.setText(value)
 
@@ -84,17 +84,27 @@ class MainSection(QWidget):
             text.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
             # Style optionnel (bulle)
-            text.setStyleSheet("""
-                QTextBrowser {
+            if isUser:
+                color = "#0A0A55"
+            else: color = "#0A0A0A"
+
+            text.setStyleSheet(f"""
+                QTextBrowser {{
                     padding: 8px;
                     border-radius: 12px;
-                    background-color: #0A0A0A;
+                    background-color: {color};
                     border: none;
-                }
+                }}
             """)
 
-            layout.addWidget(text, 70)
-            layout.addStretch(30)
+            if isUser:
+                text.setAlignment(Qt.AlignRight)
+                layout.addStretch(30)
+                layout.addWidget(text, 70)
+            else:
+                layout.addWidget(text, 70)
+                layout.addStretch(30)
+
 
             self.scroll_layout.addLayout(layout)
 

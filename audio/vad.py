@@ -2,7 +2,7 @@ import torch
 import queue
 
 class VAD:
-    def __init__(self, sig,audio_queue: queue.Queue, speech_queue: queue.Queue
+    def __init__(self, sig, audio_queue: queue.Queue, speech_queue: queue.Queue
                  ,samplerate=16000, threshold=0.5):
         self.audio_queue = audio_queue
         self.speech_queue = speech_queue
