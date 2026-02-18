@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+</head>
+<body style="font-family: Arial; text-align: center; margin-top: 50px;">
+
+    <h1 id="title">Interface Web</h1>
+    <button onclick="sendToPython()">Envoyer à Python</button>
+
+    <script>
+        var backend;
+
+        new QWebChannel(qt.webChannelTransport, function(channel) {
+            backend = channel.objects.backend;
+        });
+
+        function updateFromPython(message) {
+            document.getElementById("title").innerText = message;
+        }
+
+        function sendToPython() {
+            backend.receive_from_js("Salut Python 👋");
+        }
+    </script>
+
+</body>
+</html>

@@ -1,13 +1,19 @@
-from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QTextBrowser, QHBoxLayout
+from PySide6.QtWidgets import (QWidget, QLabel, QVBoxLayout, QPushButton, QTextBrowser,
+QScrollArea, QHBoxLayout)
 from PySide6.QtCore import Qt
+from gui.chatBubble import ChatBubble
+from gui.bullMessage import BullMessage
 
 class MainSection(QWidget):
     def __init__(self, sig):
         super().__init__()
+        print(self.width(), self.height())
+
         self.signal = sig
         self.toggle = False
         self.title = QLabel("Résultat de la transcription avec whisper")
         self.signal.titre.connect(self.changeTitre)
+        self.signal.newMessage.connect(self.addNewLine)
 
         self.send = QPushButton("Démarrer")
         self.send.clicked.connect(self.HandleChange)
@@ -18,6 +24,7 @@ class MainSection(QWidget):
 
         self.suggestion1 = QTextBrowser()
         self.suggestion1.setText("Suggestion 1")
+        self.suggestion1.setObjectName("suggestion")
         self.signal.sug1.connect(self.setSuggestion1)
         
         self.suggestion2 = QTextBrowser()
@@ -34,14 +41,31 @@ class MainSection(QWidget):
 
         suggestionTitre = QLabel("Suggestions")
 
+
         self.mainLayout = QHBoxLayout()
         sec1 = QVBoxLayout()
         sec1.setAlignment(Qt.AlignTop)
         sec2 = QVBoxLayout()
         sec2.setAlignment(Qt.AlignTop)
 
-        sec1.addWidget(self.title)
-        sec1.addWidget(self.text)
+        la1 = QVBoxLayout()
+        la2 = QVBoxLayout()
+        
+        la1.addWidget(self.title)
+        # la1.addWidget(self.text)
+
+
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+
+        container = QWidget()
+        self.scroll_layout = QVBoxLayout(container)
+        self.scroll_layout.setAlignment(Qt.AlignTop)
+        scroll.setWidget(container)
+
+        la2.addWidget(scroll)
+        sec1.addLayout(la1)
+        sec1.addLayout(la2)
 
         sec2.addWidget(suggestionTitre)
         sec2.addWidget(self.suggestion1)
@@ -52,6 +76,15 @@ class MainSection(QWidget):
         self.mainLayout.addLayout(sec1, 60)
         self.mainLayout.addLayout(sec2, 40)
         self.setLayout(self.mainLayout)
+
+        self.suggestion3.setStyleSheet("""
+            QTextBrowser#suggestion {
+                background-color: #2d2d2d;
+                border-radius: 12px;
+                padding: 12px;
+                color: white;
+            }
+        """)
 
     def changeTitre(self,value):
         self.title.setText(value)
@@ -78,3 +111,21 @@ class MainSection(QWidget):
     
     def setSuggestion4(self,value):
         self.suggestion4.setText(value)
+
+
+    def addNewLine(self, text):
+        self.toggle = not self.toggle
+        self.addMessage(text, self.toggle)
+
+    def addMessage(self, text, isUser: bool):
+        container = QWidget()
+        layout = QHBoxLayout(container)
+        if isUser:
+            message = BullMessage(container, text,"#0A0A55")
+            layout.addStretch(3)
+            layout.addWidget(message, 7)
+        else:
+            message = BullMessage(container, text)
+            layout.addWidget(message, 7)
+            layout.addStretch(3)
+        self.scroll_layout.addWidget(container)
