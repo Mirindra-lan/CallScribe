@@ -9,7 +9,7 @@ class WhisperAsr:
 
     def transcribe(self, audio, isUser):
         self.sig.titre.emit("Transcription en cours...")
-        res = self.model.transcribe(audio, language="en")
+        res = self.model.transcribe(audio, language="fr")
         self.sig.text.emit(res["text"], isUser)
         self.sig.titre.emit("Fin de transcription")
         # print("transcription en cours....")

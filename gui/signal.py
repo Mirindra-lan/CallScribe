@@ -8,3 +8,6 @@ class UiSignal(QObject):
     sug2 = Signal(str)
     sug3 = Signal(str)
     sug4 = Signal(str)
+    voskTitre = Signal(str)
+    voskPart = Signal(str)
+    voskRes = Signal(str)

@@ -21,7 +21,7 @@ class InputSound:
         self.voice_queue.put(audio_48k.copy())
         return None, paudio.paContinue
     
-    def start(self):
+    def start(self, model):
         self.stream = self.pa.open(
             format=paudio.paFloat32,
             channels=1,
@@ -32,8 +32,10 @@ class InputSound:
             stream_callback=self.callback
         )
         self.stream.start_stream()
-
-        self.processing_thread = threading.Thread(target=self.process_chunk, daemon=True)
+        if model == "Vosk":
+            self.processing_thread = threading.Thread(target=self.process_chunk2, daemon=True)
+        else : 
+            self.processing_thread = threading.Thread(target=self.process_chunk, daemon=True)
         self.processing_thread.start()
 
     def process_chunk(self):
@@ -46,6 +48,29 @@ class InputSound:
                 chunk = self.buffer_16k[:512]
                 self.buffer_16k = self.buffer_16k[512:]
                 self.audio_queue.put(chunk)
+
+            self.voice_queue.task_done()
+    
+    def process_chunk2(self):
+        while True:
+            audio_48k = self.voice_queue.get()
+
+            # 1️⃣ Downsample simple (48000 → 16000)
+            audio_16k = audio_48k[::3]
+
+            # 2️⃣ float32 → int16 PCM
+            audio_int16 = (audio_16k * 32767).astype(np.int16)
+
+            # 3️⃣ Accumulation buffer
+            self.buffer_16k = np.concatenate((self.buffer_16k, audio_int16))
+
+            # 4️⃣ Chunk optimal pour Vosk (2048 recommandé)
+            while len(self.buffer_16k) >= 2048:
+                chunk = self.buffer_16k[:2048]
+                self.buffer_16k = self.buffer_16k[2048:]
+
+                # 5️⃣ envoyer bytes prêts pour Vosk
+                self.audio_queue.put(chunk.tobytes())
 
             self.voice_queue.task_done()
 

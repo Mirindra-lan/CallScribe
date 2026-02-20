@@ -13,7 +13,10 @@ class Microphone:
     def callback(self, indata, frames, time, status):
         if status:
             print(status)
-        self.audio_queue.put(indata.copy())
+        if self.dtype == 'int16':
+            self.audio_queue.put(bytes(indata))
+        else:
+            self.audio_queue.put(indata.copy())
 
     def start(self):
         if not self.isRuning:
